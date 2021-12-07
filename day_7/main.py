@@ -1,35 +1,40 @@
-from collections import defaultdict
+from math import ceil, floor
+from statistics import mean, median
 
 
 def run():
     with open('input.txt') as f:
-        fish_counts = defaultdict(int)
-        for initial_timer_str in f.readline().strip().split(','):
-            fish_counts[int(initial_timer_str)] += 1
+        crab_positions = [int(position_str) for position_str in f.readline().split(',')]
 
-    part_x(fish_counts)
-    part_x(fish_counts, total_days=256)
+    part_1(crab_positions)
+    part_2(crab_positions)
 
 
-# PART 1 AND 2
-
-NEW_FISH_INITIAL_TIMER = 8
-CREATE_FISH_TIME = 0
-CREATE_FISH_RESET_TIMER = 6
+# PART 1
 
 
-def part_x(fish_counts, total_days=80):
-    for _ in range(total_days):
-        new_fish_counts = defaultdict(int)
-        for time, fish_count in fish_counts.items():
-            if time != CREATE_FISH_TIME:
-                new_fish_counts[time - 1] += fish_count
-            else:
-                new_fish_counts[CREATE_FISH_RESET_TIMER] += fish_count
-                new_fish_counts[NEW_FISH_INITIAL_TIMER] += fish_count
-        fish_counts = new_fish_counts
+def part_1(crab_positions):
+    crab_positions_median = round(median(crab_positions))
+    total_fuel_cost = 0
+    for crab_position in crab_positions:
+        total_fuel_cost += abs(crab_position - crab_positions_median)
 
-    print(sum(fish_counts.values()))
+    print(total_fuel_cost)
+
+
+# PART 2
+
+
+def part_2(crab_positions):
+    # Direct rounding does not always give the best answer here
+    crab_positions_means = [floor(mean(crab_positions)), ceil(mean(crab_positions))]
+    for crab_positions_mean in crab_positions_means:
+        total_fuel_cost = 0
+        for crab_position in crab_positions:
+            positions_moved = abs(crab_position - crab_positions_mean)
+            total_fuel_cost += int(0.5 * positions_moved * (1 + positions_moved))
+        # Use the lower value
+        print(total_fuel_cost)
 
 
 if __name__ == '__main__':
